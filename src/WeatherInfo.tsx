@@ -1,18 +1,35 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
+type WeatherData = {
+    base : string,
+    clouds : object,
+    cod :string,
+    coord:object,
+    dt :string,
+    id : number,
+    main: object,
+    name: String,
+    sys:Object,
+    timezone:string,
+    visiblity : string,
+    weather:Array<String>,
+    wind:Object,
+}
+
 export default function WeatherInfo() {
-    const [weatherInfo, setWeatherInfo] = useState([]);
+    // @ts-ignore
+    const [weatherInfo, setWeatherInfo] = useState<WeatherData>([]);
     const [searchText, setSearchText] = useState("India");
 
     useEffect(() => { 
-        getWeatherInfo('India');
+        getWeatherInfo();
         return () => {
           
         }
       }, [])
 
-    const getWeatherInfo=(country) =>{
+    const  getWeatherInfo= () =>{
         if(searchText.length<3) {
             alert('No Text')
             return
@@ -32,14 +49,15 @@ export default function WeatherInfo() {
     
     return (
         <div>
-            <input style={{padding:'10px', width:'500px'}} Placeholder="Add Country Details"  name="search" onChange={(e) => setSearchText(e.target.value)} value={searchText}/>
+            <input style={{padding:'10px', width:'500px'}} placeholder="Add Country Details"  name="search" onChange={(e) => setSearchText(e.target.value)} value={searchText}/>
             &nbsp;<button style={{padding:'10px', }} disabled={searchText <3 ? true : false} onClick={() => getWeatherInfo()}>Search</button>
 
 
 
             <h3>Weather Info</h3>
 
-            <table >
+            { weatherInfo.length != 0 ? 
+            <table data-testid ="Weather-information">
 
                 <tr>
                     <td>Name :</td>
@@ -55,22 +73,19 @@ export default function WeatherInfo() {
                     <td>Humadity :</td>
                     <td> {weatherInfo?.main?.humidity}</td>
                 </tr>
-                <img src={'https://scx2.b-cdn.net/gfx/news/2019/weatherforec.jpg'} height='150px' width='200px'/>
+                <img alt="weather-icon" src={'https://scx2.b-cdn.net/gfx/news/2019/weatherforec.jpg'} height='150px' width='200px'/>
                 <tr>
                     <td>Weather :</td>
 
                     <td> {weatherInfo?.weather && weatherInfo?.weather[0]?.description}</td>
                 </tr>
-                {/* <tr>
-                    <td>Name :</td>
-                    <td> {WeatherInfo.name}</td>
-                </tr>
                 <tr>
-                    <td>Name :</td>
-                    <td> {WeatherInfo.name}</td>
-                </tr> */}
-            </table>
-
+                    <td>Wind speed :</td>
+                    <td> {weatherInfo?.wind?.speed}</td>
+                </tr>
+            </table> :
+            <div data-testid ="loading-information"> Loading Data ......</div>
+                } 
         </div>
     )
 }
